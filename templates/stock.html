@@ -1,0 +1,642 @@
+{% extends "base.html" %}
+
+{% block title %}
+TradeVerse - {{ stock.symbol }}
+{% endblock %}
+
+{% block content %}
+
+    <!-- ================= STOCK HEADER ================= -->
+
+    <div class="card">
+
+        <h1>{{ stock.symbol }}</h1>
+
+        <p>
+            Stock Analysis & Virtual Trading
+        </p>
+
+    </div>
+
+
+    <!-- ================= STOCK INFORMATION ================= -->
+
+    <div class="card">
+
+        <h2>📊 Stock Information</h2>
+
+        <p>
+            <strong>Open:</strong>
+            ₹{{ stock.open }}
+        </p>
+
+        <p>
+            <strong>High:</strong>
+            ₹{{ stock.high }}
+        </p>
+
+        <p>
+            <strong>Low:</strong>
+            ₹{{ stock.low }}
+        </p>
+
+        <p>
+            <strong>Latest Available Price:</strong>
+            ₹{{ stock.close }}
+        </p>
+
+        <p>
+            <strong>Volume:</strong>
+            {{ stock.volume }}
+        </p>
+
+    </div>
+
+
+    <!-- ================= VIRTUAL TRADING ================= -->
+
+    <div class="card">
+
+        <h2>💰 Virtual Trading</h2>
+
+        <p>
+            Available Balance:
+
+            <strong>
+                ₹{{ "{:,.2f}".format(user.virtual_balance) }}
+            </strong>
+        </p>
+
+        <p>
+            Current Price:
+
+            <strong>
+                ₹{{ "{:,.2f}".format(stock.close) }}
+            </strong>
+        </p>
+
+
+        {% if holding %}
+
+            <hr>
+
+            <h3>Your Holdings</h3>
+
+            <p>
+                You own:
+
+                <strong>
+                    {{ holding.quantity }}
+                </strong>
+
+                shares
+            </p>
+
+            <p>
+                Average Buy Price:
+
+                <strong>
+                    ₹{{ "{:,.2f}".format(holding.average_price) }}
+                </strong>
+            </p>
+
+        {% endif %}
+
+
+        <hr>
+
+        <h3>Buy Stock</h3>
+
+        <form
+            action="{{ url_for('buy') }}"
+            method="POST"
+        >
+
+            <input
+                type="hidden"
+                name="symbol"
+                value="{{ stock.symbol }}"
+            >
+
+            <label for="buy_quantity">
+                Quantity:
+            </label>
+
+            <input
+                type="number"
+                name="quantity"
+                id="buy_quantity"
+                min="1"
+                required
+            >
+
+            <button type="submit">
+                Buy Stock
+            </button>
+
+        </form>
+
+
+        {% if holding %}
+
+            <hr>
+
+            <h3>Sell Stock</h3>
+
+            <form
+                action="{{ url_for('sell') }}"
+                method="POST"
+            >
+
+                <input
+                    type="hidden"
+                    name="symbol"
+                    value="{{ stock.symbol }}"
+                >
+
+                <label for="sell_quantity">
+                    Quantity:
+                </label>
+
+                <input
+                    type="number"
+                    name="quantity"
+                    id="sell_quantity"
+                    min="1"
+                    max="{{ holding.quantity }}"
+                    required
+                >
+
+                <button type="submit">
+                    Sell Stock
+                </button>
+
+            </form>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- ================= WATCHLIST ================= -->
+
+    <div class="card">
+
+        <h2>⭐ Watchlist</h2>
+
+        <form
+            action="{{ url_for('add_watchlist') }}"
+            method="POST"
+        >
+
+            <input
+                type="hidden"
+                name="symbol"
+                value="{{ stock.symbol }}"
+            >
+
+            <button type="submit">
+                + Add to Watchlist
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- ================= TECHNICAL INDICATORS ================= -->
+
+    <div class="card">
+
+        <h2>📈 Technical Indicators</h2>
+
+        <p>
+
+            <strong>SMA (10):</strong>
+
+            {% if stock.sma is not none %}
+
+                ₹{{ stock.sma }}
+
+            {% else %}
+
+                Not enough data
+
+            {% endif %}
+
+            -
+
+            <strong>Signal:</strong>
+            {{ stock.sma_signal }}
+
+        </p>
+
+
+        <p>
+
+            <strong>RSI (14):</strong>
+
+            {% if stock.rsi is not none %}
+
+                {{ stock.rsi }}
+
+            {% else %}
+
+                Not enough data
+
+            {% endif %}
+
+            -
+
+            <strong>Signal:</strong>
+            {{ stock.rsi_signal }}
+
+        </p>
+
+
+        <p>
+
+            <strong>MACD:</strong>
+
+            {% if stock.macd is not none %}
+
+                {{ stock.macd }}
+
+            {% else %}
+
+                Not enough data
+
+            {% endif %}
+
+            -
+
+            <strong>Signal:</strong>
+            {{ stock.macd_signal }}
+
+        </p>
+
+
+        <p>
+
+            <strong>Signal Line:</strong>
+
+            {% if stock.signal is not none %}
+
+                {{ stock.signal }}
+
+            {% else %}
+
+                Not enough data
+
+            {% endif %}
+
+        </p>
+
+    </div>
+
+
+    <!-- ================= RECOMMENDATION ================= -->
+
+    <div class="card">
+
+        <h2>🤖 TradeVerse Recommendation</h2>
+
+        <p>
+
+            <strong>Score:</strong>
+
+            {{ stock.score }} / 3
+
+        </p>
+
+
+        <p>
+
+            <strong>Recommendation:</strong>
+
+            <strong>
+
+                {% if stock.recommendation == "BUY" %}
+
+                    <span class="positive">
+                        🟢 BUY
+                    </span>
+
+                {% elif stock.recommendation == "SELL" %}
+
+                    <span class="negative">
+                        🔴 SELL
+                    </span>
+
+                {% else %}
+
+                    <span class="neutral">
+                        🟡 HOLD
+                    </span>
+
+                {% endif %}
+
+            </strong>
+
+        </p>
+
+
+        <p>
+
+            <strong>Analysis:</strong>
+
+            {% if stock.recommendation == "BUY" %}
+
+                Multiple technical indicators show bullish
+                conditions. TradeVerse generates a BUY
+                recommendation based on the combined score.
+
+            {% elif stock.recommendation == "SELL" %}
+
+                Multiple technical indicators show bearish
+                conditions. TradeVerse generates a SELL
+                recommendation based on the combined score.
+
+            {% else %}
+
+                The technical indicators do not show strong
+                agreement. TradeVerse generates a HOLD
+                recommendation.
+
+            {% endif %}
+
+        </p>
+
+    </div>
+
+
+    <!-- ================= HISTORICAL PRICE CHART ================= -->
+
+    <div class="card">
+
+        <h2>📉 Historical Price Chart</h2>
+
+        <canvas id="stockChart"></canvas>
+
+    </div>
+
+
+    <!-- ================= MACD CHART ================= -->
+
+    <div class="card">
+
+        <h2>📊 MACD Chart</h2>
+
+        <canvas id="macdChart"></canvas>
+
+    </div>
+
+
+    <!-- ================= RSI INFORMATION ================= -->
+
+    <div class="card">
+
+        <h2>📊 RSI (14)</h2>
+
+        <p>
+
+            <strong>Current RSI:</strong>
+
+            {% if stock.rsi is not none %}
+
+                {{ stock.rsi }}
+
+            {% else %}
+
+                Not enough data
+
+            {% endif %}
+
+        </p>
+
+
+        <p>
+
+            <strong>RSI Interpretation:</strong>
+
+            {% if stock.rsi is not none %}
+
+                {% if stock.rsi >= 70 %}
+
+                    Potentially Overbought
+
+                {% elif stock.rsi <= 30 %}
+
+                    Potentially Oversold
+
+                {% else %}
+
+                    Neutral Range
+
+                {% endif %}
+
+            {% else %}
+
+                Not enough data
+
+            {% endif %}
+
+        </p>
+
+    </div>
+
+
+    <!-- ================= CHART.JS ================= -->
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+
+        const dates = {{ chart_dates | tojson }};
+
+        const prices = {{ chart_prices | tojson }};
+
+        const sma = {{ chart_sma | tojson }};
+
+        const macd = {{ chart_macd | tojson }};
+
+        const signalLine = {{ chart_signal | tojson }};
+
+
+        // ==========================================
+        // Historical Price + SMA Chart
+        // ==========================================
+
+        const ctx =
+            document.getElementById("stockChart");
+
+
+        new Chart(ctx, {
+
+            type: "line",
+
+            data: {
+
+                labels: dates,
+
+                datasets: [
+
+                    {
+
+                        label:
+                            "{{ stock.symbol }} Closing Price",
+
+                        data: prices,
+
+                        borderWidth: 2,
+
+                        tension: 0.3,
+
+                        fill: false
+
+                    },
+
+                    {
+
+                        label: "SMA (10)",
+
+                        data: sma,
+
+                        borderWidth: 2,
+
+                        tension: 0.3,
+
+                        fill: false
+
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                scales: {
+
+                    x: {
+
+                        title: {
+
+                            display: true,
+
+                            text: "Date"
+
+                        }
+
+                    },
+
+                    y: {
+
+                        title: {
+
+                            display: true,
+
+                            text: "Price (₹)"
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        });
+
+
+        // ==========================================
+        // MACD Chart
+        // ==========================================
+
+        const macdCtx =
+            document.getElementById("macdChart");
+
+
+        new Chart(macdCtx, {
+
+            type: "line",
+
+            data: {
+
+                labels: dates,
+
+                datasets: [
+
+                    {
+
+                        label: "MACD",
+
+                        data: macd,
+
+                        borderWidth: 2,
+
+                        tension: 0.3,
+
+                        fill: false
+
+                    },
+
+                    {
+
+                        label: "Signal Line",
+
+                        data: signalLine,
+
+                        borderWidth: 2,
+
+                        tension: 0.3,
+
+                        fill: false
+
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                scales: {
+
+                    x: {
+
+                        title: {
+
+                            display: true,
+
+                            text: "Date"
+
+                        }
+
+                    },
+
+                    y: {
+
+                        title: {
+
+                            display: true,
+
+                            text: "MACD"
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        });
+
+    </script>
+
+{% endblock %}

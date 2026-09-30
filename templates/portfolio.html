@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}
+TradeVerse - Portfolio
+{% endblock %}
+
+{% block content %}
+
+    <div class="card">
+
+        <h1>📁 My Portfolio</h1>
+
+        <p>
+            Your current virtual stock holdings.
+        </p>
+
+    </div>
+
+
+    {% if holdings %}
+
+        {% for item in holdings %}
+
+            <div class="card">
+
+                <h2>{{ item.symbol }}</h2>
+
+                <p>
+                    <strong>Quantity:</strong>
+                    {{ item.quantity }}
+                </p>
+
+                <p>
+                    <strong>Average Buy Price:</strong>
+                    ₹{{ "{:,.2f}".format(item.average_price) }}
+                </p>
+
+                <p>
+                    <strong>Current Price:</strong>
+                    ₹{{ "{:,.2f}".format(item.current_price) }}
+                </p>
+
+                <p>
+                    <strong>Invested Value:</strong>
+                    ₹{{ "{:,.2f}".format(item.invested_value) }}
+                </p>
+
+                <p>
+                    <strong>Current Value:</strong>
+                    ₹{{ "{:,.2f}".format(item.current_value) }}
+                </p>
+
+                <p>
+                    <strong>Profit / Loss:</strong>
+
+                    {% if item.profit_loss >= 0 %}
+
+                        <span class="positive">
+                            ₹{{ "{:,.2f}".format(item.profit_loss) }}
+                        </span>
+
+                    {% else %}
+
+                        <span class="negative">
+                            ₹{{ "{:,.2f}".format(item.profit_loss) }}
+                        </span>
+
+                    {% endif %}
+
+                </p>
+
+                <p>
+                    <strong>Profit / Loss %:</strong>
+
+                    {% if item.profit_loss_percent >= 0 %}
+
+                        <span class="positive">
+                            {{ "{:,.2f}".format(item.profit_loss_percent) }}%
+                        </span>
+
+                    {% else %}
+
+                        <span class="negative">
+                            {{ "{:,.2f}".format(item.profit_loss_percent) }}%
+                        </span>
+
+                    {% endif %}
+
+                </p>
+
+                <br>
+
+                <h3>Sell Stock</h3>
+
+                <form action="{{ url_for('sell') }}" method="POST">
+
+                    <input
+                        type="hidden"
+                        name="symbol"
+                        value="{{ item.symbol }}"
+                    >
+
+                    <input
+                        type="number"
+                        name="quantity"
+                        min="1"
+                        max="{{ item.quantity }}"
+                        placeholder="Quantity"
+                        required
+                    >
+
+                    <button type="submit">
+                        Sell
+                    </button>
+
+                </form>
+
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="card">
+
+            <h2>No Holdings</h2>
+
+            <p>
+                You don't currently own any stocks.
+            </p>
+
+            <br>
+
+            <a href="/dashboard">
+                <button type="button">
+                    Search Stocks
+                </button>
+            </a>
+
+        </div>
+
+    {% endif %}
+
+
+    <div class="card">
+
+        <h2>💰 Available Balance</h2>
+
+        <h2>
+            ₹{{ "{:,.2f}".format(user.virtual_balance) }}
+        </h2>
+
+    </div>
+
+{% endblock %}

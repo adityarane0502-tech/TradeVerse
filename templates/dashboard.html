@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>TradeVerse - Dashboard</title>
+</head>
+
+<body>
+
+    <header>
+        <h1>TradeVerse</h1>
+
+        <p>
+            Welcome, {{ user.name }}!
+        </p>
+
+        <nav>
+
+        <a href="/dashboard">🏠 Dashboard</a>
+
+        <a href="/portfolio">📁 Portfolio</a>
+
+        <a href="/watchlist">⭐ Watchlist</a>
+
+        <a href="/transactions">📜 Transactions</a>
+
+        <a href="/logout">🚪 Logout</a>
+
+        </nav>{% extends "base.html" %}
+
+{% block title %}
+TradeVerse - Dashboard
+{% endblock %}
+
+{% block content %}
+
+    <div class="card">
+
+        <h1>Dashboard</h1>
+
+        <p>
+            Welcome, <strong>{{ user.name }}</strong>! 👋
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>💰 Virtual Balance</h2>
+
+        <h1>
+            ₹{{ "%.2f"|format(user.virtual_balance) }}
+        </h1>
+
+        <p>
+            Available virtual funds for trading
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>🔍 Search Stock</h2>
+
+        <p>
+            Search NSE stocks for price data and technical analysis.
+        </p>
+
+        <br>
+
+        <form action="/search" method="POST">
+
+            <input
+                type="text"
+                name="symbol"
+                placeholder="Enter stock symbol e.g. TCS"
+                required
+            >
+
+            <button type="submit">
+                Search
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>⚡ Quick Access</h2>
+
+        <br>
+
+        <a href="/portfolio">
+            <button type="button">
+                📁 Portfolio
+            </button>
+        </a>
+
+        <a href="/watchlist">
+            <button type="button">
+                ⭐ Watchlist
+            </button>
+        </a>
+
+        <a href="/transactions">
+            <button type="button">
+                📜 Transactions
+            </button>
+        </a>
+
+    </div>
+
+{% endblock %}
+
+    </header>
+
+    <hr>
+
+    <main>
+
+        <h2>Dashboard</h2>
+
+        <section>
+            <h3>Virtual Balance</h3>
+
+            <p>
+                ₹{{ "%.2f"|format(user.virtual_balance) }}
+            </p>
+        </section>
+
+        <hr>
+
+        <section>
+            <h3>Search Stock</h3>
+
+            <form action="/search" method="POST">
+                <input
+                    type="text"
+                    name="symbol"
+                    placeholder="Enter stock symbol e.g. TCS"
+                    required
+                >
+
+                <button type="submit">
+                    Search
+                </button>
+            </form>
+        </section>
+
+        <hr>
+
+        <section>
+
+        <h3>Quick Access</h3>
+
+        <a href="/portfolio">
+            <button type="button">📁 Portfolio</button>
+        </a>
+
+        <a href="/watchlist">
+            <button type="button">⭐ Watchlist</button>
+        </a>
+
+        <a href="/transactions">
+            <button type="button">📜 Transactions</button>
+        </a>
+
+        </section>
+
+    </main>
+
+</body>
+</html>

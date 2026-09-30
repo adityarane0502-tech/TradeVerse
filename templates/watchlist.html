@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+
+{% block title %}
+TradeVerse - Watchlist
+{% endblock %}
+
+{% block content %}
+
+    <div class="card">
+
+        <h1>⭐ My Watchlist</h1>
+
+        <p>
+            Stocks you're monitoring without owning them.
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>➕ Add Stock</h2>
+
+        <form
+            action="{{ url_for('add_watchlist') }}"
+            method="POST"
+        >
+
+            <input
+                type="text"
+                name="symbol"
+                placeholder="Enter stock symbol e.g. TCS"
+                required
+            >
+
+            <button type="submit">
+                Add to Watchlist
+            </button>
+
+        </form>
+
+    </div>
+
+
+    {% if watchlist %}
+
+        {% for item in watchlist %}
+
+            <div class="card">
+
+                <h2>
+                    {{ item.symbol }}
+                </h2>
+
+                <p>
+                    <strong>Current Price:</strong>
+                    ₹{{ "{:,.2f}".format(item.current_price) }}
+                </p>
+
+                <p>
+                    <strong>Technical Score:</strong>
+
+                    {% if item.score > 0 %}
+
+                        <span class="positive">
+                            +{{ item.score }}
+                        </span>
+
+                    {% elif item.score < 0 %}
+
+                        <span class="negative">
+                            {{ item.score }}
+                        </span>
+
+                    {% else %}
+
+                        <span class="neutral">
+                            {{ item.score }}
+                        </span>
+
+                    {% endif %}
+
+                </p>
+
+                <p>
+                    <strong>Recommendation:</strong>
+
+                    {% if item.recommendation == "BUY" %}
+
+                        <span class="positive">
+                            BUY
+                        </span>
+
+                    {% elif item.recommendation == "SELL" %}
+
+                        <span class="negative">
+                            SELL
+                        </span>
+
+                    {% else %}
+
+                        <span class="neutral">
+                            HOLD
+                        </span>
+
+                    {% endif %}
+
+                </p>
+
+                <br>
+
+                <form
+                    action="{{ url_for('remove_watchlist') }}"
+                    method="POST"
+                >
+
+                    <input
+                        type="hidden"
+                        name="symbol"
+                        value="{{ item.symbol }}"
+                    >
+
+                    <button type="submit">
+                        Remove
+                    </button>
+
+                </form>
+
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="card">
+
+            <h2>Watchlist is Empty</h2>
+
+            <p>
+                Add stocks that you want to monitor.
+            </p>
+
+            <br>
+
+            <a href="/dashboard">
+                <button type="button">
+                    Search Stocks
+                </button>
+            </a>
+
+        </div>
+
+    {% endif %}
+
+
+        <!-- ================= SUGGESTED STOCKS ================= -->
+
+    <div class="card">
+
+        <h2>📈 Suggested Stocks</h2>
+
+        <p>
+            Explore popular NSE stocks and their current
+            TradeVerse technical recommendation.
+        </p>
+
+    </div>
+
+
+    {% if suggested_stocks %}
+
+        {% for item in suggested_stocks %}
+
+            <div class="card">
+
+                <h2>
+                    <form action="/search" method="POST">
+
+                        <input
+                            type="hidden"
+                            name="symbol"
+                            value="{{ item.symbol }}"
+                        >
+
+                        <button type="submit">
+                            {{ item.symbol }}
+                        </button>
+
+                    </form>
+                </h2>
+
+                <p>
+                    <strong>Current Price:</strong>
+                    ₹{{ "{:,.2f}".format(item.current_price) }}
+                </p>
+
+                <p>
+                    <strong>Technical Score:</strong>
+
+                    {% if item.score > 0 %}
+
+                        <span class="positive">
+                            +{{ item.score }}
+                        </span>
+
+                    {% elif item.score < 0 %}
+
+                        <span class="negative">
+                            {{ item.score }}
+                        </span>
+
+                    {% else %}
+
+                        <span class="neutral">
+                            {{ item.score }}
+                        </span>
+
+                    {% endif %}
+
+                </p>
+
+
+                <p>
+
+                    <strong>Recommendation:</strong>
+
+                    {% if item.recommendation == "BUY" %}
+
+                        <span class="positive">
+                            🟢 BUY
+                        </span>
+
+                    {% elif item.recommendation == "SELL" %}
+
+                        <span class="negative">
+                            🔴 SELL
+                        </span>
+
+                    {% else %}
+
+                        <span class="neutral">
+                            🟡 HOLD
+                        </span>
+
+                    {% endif %}
+
+                </p>
+
+
+                <br>
+
+
+                <form
+                    action="{{ url_for('add_watchlist') }}"
+                    method="POST"
+                >
+
+                    <input
+                        type="hidden"
+                        name="symbol"
+                        value="{{ item.symbol }}"
+                    >
+
+                    <button type="submit">
+                        + Add to Watchlist
+                    </button>
+
+                </form>
+
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="card">
+
+            <p>
+                All suggested stocks are already in your
+                watchlist.
+            </p>
+
+        </div>
+
+    {% endif %}
+{% endblock %}

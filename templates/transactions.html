@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}
+TradeVerse - Transaction History
+{% endblock %}
+
+{% block content %}
+
+    <div class="card">
+
+        <h1>📜 Transaction History</h1>
+
+        <p>
+            Complete record of your virtual trades.
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>💰 Current Balance</h2>
+
+        <h2>
+            ₹{{ "{:,.2f}".format(user.virtual_balance) }}
+        </h2>
+
+    </div>
+
+
+    {% if transactions %}
+
+        <div class="card">
+
+            <h2>All Transactions</h2>
+
+            <br>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Date & Time</th>
+                        <th>Type</th>
+                        <th>Stock</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for transaction in transactions %}
+
+                        <tr>
+
+                            <td>
+                                {{ transaction.timestamp.strftime(
+                                    "%d %b %Y, %I:%M %p"
+                                ) }}
+                            </td>
+
+                            <td>
+
+                                {% if transaction.transaction_type == "BUY" %}
+
+                                    <span class="positive">
+                                        BUY
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="negative">
+                                        SELL
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <td>
+                                {{ transaction.symbol }}
+                            </td>
+
+                            <td>
+                                {{ transaction.quantity }}
+                            </td>
+
+                            <td>
+                                ₹{{ "{:,.2f}".format(transaction.price) }}
+                            </td>
+
+                            <td>
+                                ₹{{ "{:,.2f}".format(transaction.total_amount) }}
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    {% else %}
+
+        <div class="card">
+
+            <h2>No Transactions</h2>
+
+            <p>
+                You haven't made any virtual trades yet.
+            </p>
+
+            <br>
+
+            <a href="/dashboard">
+
+                <button type="button">
+                    Start Trading
+                </button>
+
+            </a>
+
+        </div>
+
+    {% endif %}
+
+{% endblock %}
